@@ -1,24 +1,33 @@
 /**
  * Функция для расчета прибыли
- * @param sale_price
- * @param quantity
- * @param discount
+ * @param purchase запись о покупке
+ * @param _product карточка товара
  * @returns {number}
  */
-function calculateSimpleRevenue(sale_price, quantity, discount) {
-    const discountPercent = discount || 0;
-    const discountFactor = discountPercent ? (1 - discountPercent / 100) : 1;
-    return sale_price * quantity * discountFactor;
+function calculateSimpleRevenue(purchase, _product) {
+    // Расчет прибыли от операции
+    // Предположим, что прибыль — это разница между ценой продажи и закупочной стоимости, умноженная на количество
+    const salePrice = Number(purchase.sale_price);
+    const purchasePrice = _product.purchase_price;
+    const quantity = Number(purchase.quantity);
+
+    if (isNaN(salePrice) || isNaN(purchasePrice) || isNaN(quantity)) {
+        return 0;
+    }
+
+    const profitPerUnit = salePrice - purchasePrice;
+    return profitPerUnit * quantity;
 }
 
 /**
- * Функция для определения процента бонуса по рангу продавца
- * @param index - позиция в отсортированном массиве (0-based)
- * @param total - всего продавцов
- * @param seller - объект продавца (может быть использован для дополнительных расчетов)
- * @returns {number} - процент бонуса
+ * Функция для расчета бонусов
+ * @param index порядковый номер в отсортированном массиве
+ * @param total общее число продавцов
+ * @param seller карточка продавца
+ * @returns {number}
  */
 function calculateBonusByProfit(index, total, seller) {
+    // Расчет бонуса от позиции в рейтинге
     if (index === 0) return 15; // первое место — +15%
     if (index === 1 || index === 2) return 10; // второе и третье — +10%
     if (index === total -1) return 0; // последнее — +0%
@@ -26,9 +35,13 @@ function calculateBonusByProfit(index, total, seller) {
 }
 
 /**
- * Основная функция анализа данных продаж
+ * Функция для анализа данных продаж
+ * @param data
+ * @param options
+ * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
+    // Проверка входных данных
     if (!data || typeof data !== 'object') {
         throw new Error('Данные не переданы или некорректны');
     }
@@ -42,12 +55,13 @@ function analyzeSalesData(data, options) {
         throw new Error('Отсутствует массив products');
     }
 
+    // Проверка наличия опций и функции calculateRevenue
     const { calculateRevenue } = options || {};
     if (typeof calculateRevenue !== 'function') {
         throw new Error('Функция calculateRevenue должна быть передана в опциях');
     }
 
-    // Инициализация статистики по продавцам
+    // Подготовка статистики по продавцам
     const sellerStats = data.sellers.map(seller => ({
         seller_id: seller.id,
         name: [seller.first_name, seller.last_name].filter(Boolean).join(' '),
@@ -63,6 +77,7 @@ function analyzeSalesData(data, options) {
     const sellerIndex = Object.fromEntries(
         sellerStats.map(s => [s.seller_id, s])
     );
+    
     const productIndex = Object.fromEntries(
         data.products.map(p => [p.sku, p])
     );
