@@ -55,8 +55,8 @@ function analyzeSalesData(data, options) {
         revenue: 0,
         profit: 0,
         products_sold: {}, // подсчет количества товаров по sku
-        bonusPercent: 0,   // добавим поле для хранения процента бонуса
-        bonus: 0,          // сумма бонуса в валюте
+        bonusPercent: 0,
+        bonus: 0,
         top_products: []
     }));
 
@@ -73,11 +73,6 @@ function analyzeSalesData(data, options) {
         if (!seller) return;
 
         seller.sales_count +=1;
-
-        const totalAmount = record.items.reduce((sum, item) => {
-            return sum + item.sale_price * item.quantity;
-        },0);
-        seller.revenue += totalAmount;
 
         record.items.forEach(item => {
             const product = productIndex[item.sku];
@@ -104,6 +99,10 @@ function analyzeSalesData(data, options) {
                 return;
             }
 
+            // Округляем выручку до двух знаков после запятой и добавляем к общему доходу продавца
+            const roundedRevenue = Math.round(revenueItem * 100) / 100;
+            seller.revenue += roundedRevenue;
+
             const profitItem = revenueItem - cost;
 
             if (isNaN(profitItem)) {
@@ -111,7 +110,9 @@ function analyzeSalesData(data, options) {
                 return;
             }
 
-            seller.profit += profitItem;
+            // Округляем прибыль до двух знаков и добавляем к общей прибыли продавца
+            const roundedProfit = Math.round(profitItem * 100) / 100;
+            seller.profit += roundedProfit;
 
             // Подсчет количества товаров по sku у продавца
             if (!seller.products_sold[item.sku]) {
@@ -130,7 +131,7 @@ function analyzeSalesData(data, options) {
    sellerStats.forEach((seller, index) => {
        // Получаем процент бонуса по рангу
        const bonusPercent = calculateBonusByProfit(index, totalSellers, seller);
-       seller.bonusPercent = bonusPercent; // сохраняем для возможных дальнейших расчетов
+       seller.bonusPercent = bonusPercent; 
 
        // Расчет суммы бонуса как процента от прибыли
        seller.bonus = (seller.profit * bonusPercent) / 100;
@@ -154,6 +155,6 @@ function analyzeSalesData(data, options) {
        profit: +seller.profit.toFixed(2),
        sales_count: seller.sales_count,
        top_products: seller.top_products,
-       bonus: +seller.bonus.toFixed(2), // сумма бонуса в валюте с двумя знаками после запятой
+       bonus: +seller.bonus.toFixed(2),
    }));
 }
