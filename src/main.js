@@ -7,7 +7,7 @@ function calculateSimpleRevenue(purchase, _product) {
     return revenue;
   }
   
-  // Функция расчёта бонуса по позиции в рейтинге продавцов
+   // Функция расчёта бонуса по позиции в рейтинге продавцов
   function calculateBonusByProfit(index, total, seller) {
     const profit = seller.profit;
     if (index === 0) {
