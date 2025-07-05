@@ -7,7 +7,7 @@ function calculateSimpleRevenue(purchase, _product) {
     return revenue;
   }
   
-   // Функция расчёта бонуса по позиции в рейтинге продавцов
+  // Функция расчёта бонуса по позиции в рейтинге продавцов
   function calculateBonusByProfit(index, total, seller) {
     const profit = seller.profit;
     if (index === 0) {
@@ -73,26 +73,22 @@ function calculateSimpleRevenue(purchase, _product) {
       // Увеличиваем количество продаж (число чеков)
       seller.sales_count += 1;
   
-      // Увеличиваем выручку на сумму чека с учётом скидок по товарам (через функцию)
-      // Важно: total_amount в данных — без учёта скидок, поэтому считаем сами
-      // Но для надёжности считаем по каждому товару отдельно
-  
       record.items.forEach(item => {
         const product = productIndex[item.sku];
         if (!product) return;
   
-        // Себестоимость товара
-        const cost = product.purchase_price * item.quantity;
+        // Себестоимость товара с округлением
+        const cost = +(product.purchase_price * item.quantity).toFixed(2);
   
-        // Выручка с учётом скидки
-        const revenue = calculateRevenue(item, product);
+        // Выручка с учётом скидки и округлением
+        const revenue = +calculateRevenue(item, product).toFixed(2);
   
-        // Прибыль
-        const profit = revenue - cost;
+        // Прибыль с округлением
+        const profit = +(revenue - cost).toFixed(2);
   
-        // Накопление статистики
-        seller.revenue += revenue;
-        seller.profit += profit;
+        // Накопление статистики с округлением
+        seller.revenue = +(seller.revenue + revenue).toFixed(2);
+        seller.profit = +(seller.profit + profit).toFixed(2);
   
         // Увеличиваем количество проданных товаров
         if (!seller.products_sold[item.sku]) {
@@ -114,7 +110,7 @@ function calculateSimpleRevenue(purchase, _product) {
       const bonusRaw = calculateBonus(index, sellerStats.length, seller);
       seller.bonus = +bonusRaw.toFixed(2);
   
-      // Округляем выручку и прибыль
+      // Итоговое округление (на всякий случай)
       seller.revenue = +seller.revenue.toFixed(2);
       seller.profit = +seller.profit.toFixed(2);
   
@@ -136,3 +132,4 @@ function calculateSimpleRevenue(purchase, _product) {
       bonus: seller.bonus,
     }));
   }
+  
