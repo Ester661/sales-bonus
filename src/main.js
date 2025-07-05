@@ -1,4 +1,4 @@
-// 1. Функция расчета бонуса по позиции (возвращает сумму бонуса)
+// 1. Функция расчета бонуса по прибыли (возвращает сумму бонуса с точностью до двух знаков)
 function calculateBonusByProfit(index, total, seller) {
     const profit = seller.profit;
     let bonusAmount;
@@ -13,11 +13,12 @@ function calculateBonusByProfit(index, total, seller) {
       bonusAmount = profit * 0.05; // 5%
     }
   
-    return +bonusAmount.toFixed(2);
+    // Округление с учетом погрешности
+    return +((bonusAmount + 0.0000001).toFixed(2));
   }
   
   // 2. Расчет выручки с учетом скидки
-  function calculateSimpleRevenue(purchase, _product) {
+  function calculateSimpleRevenue(purchase, product) {
     const { discount = 0, sale_price, quantity } = purchase;
     const discountDecimal = discount / 100;
     const totalPrice = sale_price * quantity;
@@ -107,9 +108,8 @@ function calculateBonusByProfit(index, total, seller) {
     // Назначаем бонусы по рангу
     sortedSellers.forEach((seller, index) => {
       const bonusSum = calculateBonus(index, sortedSellers.length, seller);
-      seller.bonus = +bonusSum.toFixed(2);
-      // Округляем прибыль
-      seller.profit = +seller.profit.toFixed(2);
+      seller.bonus = +((bonusSum + 0.0000001).toFixed(2)); // исправление округления
+      seller.profit = +((seller.profit + 0.0000001).toFixed(2)); // исправление округления
       // Формируем топ-10 товаров
       const topProductsArray = Object.entries(seller.products_sold)
         .map(([sku, quantity]) => ({ sku, quantity }))
