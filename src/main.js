@@ -2,20 +2,20 @@
 function calculateSimpleRevenue(purchase, _product) {
   const discountFactor = 1 - (purchase.discount / 100);
   const revenue = purchase.sale_price * purchase.quantity * discountFactor;
-  return +revenue.toFixed(2); // Преобразуем в число
+  return +revenue; // Преобразуем в число
 }
 
 // Функция расчёта бонуса по позиции в рейтинге продавцов
 function calculateBonusByProfit(index, total, seller) {
   const profit = seller.profit;
   if (index === 0) {
-      return + (profit * 0.15).toFixed(2); // 15% для первого места
+      return + (profit * 0.15); // 15% для первого места
   } else if (index === 1 || index === 2) {
-      return + (profit * 0.10).toFixed(2); // 10% для второго и третьего
+      return + (profit * 0.10); // 10% для второго и третьего
   } else if (index === total - 1) {
       return 0; // 0% для последнего
   } else {
-      return + (profit * 0.05).toFixed(2); // 5% для остальных
+      return + (profit * 0.05); // 5% для остальных
   }
 }
 
@@ -77,17 +77,17 @@ function analyzeSalesData(data, options) {
         if (!product) return;
   
         // Расчет стоимости товара (себестоимость)
-        const cost = +(product.purchase_price * item.quantity).toFixed(2);
+        const cost = +(product.purchase_price * item.quantity);
   
         // Расчет выручки по товару
-        const revenue = +calculateRevenue(item, product).toFixed(2);
+        const revenue = +calculateRevenue(item, product);
   
         // Расчет прибыли
-        const profit = +(revenue - cost).toFixed(2);
+        const profit = +(revenue - cost);
   
         // Обновление суммы выручки и прибыли продавца
-        seller.revenue = +(seller.revenue + revenue).toFixed(2);
-        seller.profit = +(seller.profit + profit).toFixed(2);
+        seller.revenue = +(seller.revenue + revenue);
+        seller.profit = +(seller.profit + profit);
   
         // Обновление количества проданных товаров
         if (!seller.products_sold[item.sku]) {
@@ -114,11 +114,11 @@ function analyzeSalesData(data, options) {
     sellersArray.forEach((seller, index) => {
       // Расчет бонуса
       const bonusRaw = calculateBonus(index, totalSellers, seller);
-      seller.bonus = +bonusRaw.toFixed(2);
+      seller.bonus = +bonusRaw;
   
       // Округление основных показателей
-      seller.revenue = +seller.revenue.toFixed(2);
-      seller.profit = +seller.profit.toFixed(2);
+      seller.revenue = +seller.revenue;
+      seller.profit = +seller.profit;
   
       // Формируем топ-10 товаров
       seller.top_products = Object.entries(seller.products_sold)
@@ -128,9 +128,9 @@ function analyzeSalesData(data, options) {
     });
   
     sellersArray.forEach(seller => {
-      seller.revenue = +seller.revenue.toFixed(2);
-      seller.profit = +seller.profit.toFixed(2);
-      seller.bonus = +seller.bonus.toFixed(2);
+      seller.revenue = +seller.revenue;
+      seller.profit = +seller.profit;
+      seller.bonus = +seller.bonus;
     });
   
     // Формируем итоговый массив с нужными полями
